@@ -27,7 +27,7 @@ DEBUG = False
 
 class MPD(basic.LineReceiver):
     def __init__(self):
-        self.xbmc = xbmcnp.XBMCControl("xbmc", "1337")
+        self.xbmc = xbmcnp.XBMCControl("192.168.0.14", "8080")
         self.delimiter = "\n"
         self.command_list = False
         self.command_list_ok = True
@@ -37,7 +37,7 @@ class MPD(basic.LineReceiver):
         self.supported_commands = ["status", "currentsong", "pause", "play", "next", "previous",
                                    "lsinfo", "add", "deleteid", "plchanges", "search", "setvol",
                                    "list", "count", "command_list_ok_begin", "command_list_end",
-                                    "commands", "notcommands", "outputs", "tagtypes"]
+                                    "commands", "notcommands", "outputs", "tagtypes", "playid"]
         self.all_commands = ['add', 'addid', 'clear', 'clearerror', 'close', 'commands', 'consume',
                              'count', 'crossfade', 'currentsong', 'delete', 'deleteid', 'disableoutput',
                              'enableoutput', 'find', 'idle', 'kill', 'list', 'listall', 'listallinfo',
@@ -134,6 +134,8 @@ class MPD(basic.LineReceiver):
             self.tagtypes()
         elif data == "stats":
             self.stats()
+	elif data.startswith("playid"):
+	    self.playid(data[8:-1])
         elif data.startswith("pause") or data.startswith("play"):
             print "RECEIVED %s, pausing/playing" %data
             self.playpause()
@@ -218,6 +220,10 @@ class MPD(basic.LineReceiver):
     def previous(self):
         self.xbmc.prev()
         self._send()
+
+    def playid(self, song_id):
+        self.xbmc.playid(song_id)
+        self._send()    
 
     def playpause(self):
         self.xbmc.playpause()

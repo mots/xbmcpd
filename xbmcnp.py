@@ -144,6 +144,9 @@ class XBMCControl(object):
             duration = 0
         return song_count, duration
 
+    def playid(self, song_id):
+	  self.send("SetPlaylistSong(%s)" %song_id)
+
     def playpause(self):
         self.eventclient.send_action("XBMC.PlayerControl(Play)")
         #self.send("pause")
