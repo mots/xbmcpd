@@ -20,10 +20,7 @@ from twisted.internet import reactor, protocol
 from twisted.protocols import basic
 import xbmcnp
 import settings
-from pprint import pprint
 
-
-MUSICPATH = "smb://hda/Music/"
 DEBUG = False
 
 class MPD(basic.LineReceiver):
@@ -57,7 +54,7 @@ class MPD(basic.LineReceiver):
     
     def lineReceived(self, data):
         if DEBUG:
-            print "REQUEST: %s" %data
+            print "REQUEST: %s" % data
         if data == "status":
            # print "sending status"
             self.status()
@@ -135,13 +132,13 @@ class MPD(basic.LineReceiver):
             self.tagtypes()
         elif data == "stats":
             self.stats()
-	elif data.startswith("playid"):
-	    self.playid(data[8:-1])
+        elif data.startswith("playid"):
+            self.playid(data[8:-1])
         elif data.startswith("pause") or data.startswith("play"):
-            print "RECEIVED %s, pausing/playing" %data
+            print "RECEIVED %s, pausing/playing" % data
             self.playpause()
         else:
-            print "UNSUPPORTED REQUEST: %s" %data
+            print "UNSUPPORTED REQUEST: %s" % data
 
     def playlistinfo(self, pos):
         try:
@@ -155,7 +152,7 @@ class MPD(basic.LineReceiver):
         templist = []
         for i in playlist:
             templist.append(i)
-            counter+=1
+            counter += 1
             if counter == 10:
                 seperated_playlist.append(templist)
                 templist = []
@@ -210,7 +207,7 @@ class MPD(basic.LineReceiver):
         self._send()
 
     def add(self, path):
-        self.xbmc.add_to_playlist(MUSICPATH+path)
+        self.xbmc.add_to_playlist(settings.MUSICPATH+path)
         self.playlist_id += 1
         self._send()
 
@@ -282,7 +279,7 @@ class MPD(basic.LineReceiver):
             playlistlist = []
             pos = 0
             for i in albuminfo:
-                playlistlist.append(["file", i["Path"].replace(MUSICPATH, "")])
+                playlistlist.append(["file", i["Path"].replace(settings.MUSICPATH, "")])
                 playlistlist.append(["Time", i["Duration"]])
                 playlistlist.append(["Artist", i["Artist"]])
                 playlistlist.append(["Title", i["Title"]])
@@ -337,7 +334,7 @@ class MPD(basic.LineReceiver):
 
         pos = 0
         for i in playlist:
-            playlistlist.append(["file", i["Path"].replace(MUSICPATH, "")])
+            playlistlist.append(["file", i["Path"].replace(settings.MUSICPATH, "")])
             playlistlist.append(["Time", i["Duration"]])
             playlistlist.append(["Artist", i["Artist"]])
             playlistlist.append(["Title", i["Title"]])
@@ -373,16 +370,16 @@ class MPD(basic.LineReceiver):
                             ["Pos", status["SongNo"]],
                             ["Id", status["SongNo"]]])
         else:
-           self._send("OK")
+            self._send("OK")
     
     def lsinfo(self, path="/"):
-        newpath = MUSICPATH + path
+        newpath = settings.MUSICPATH + path
         subdirs, musicfiles = self.xbmc.get_directory(newpath)
         infolist = []
         for i in subdirs:
-            infolist.append(["directory", i.replace(MUSICPATH, "")[:-1]])
+            infolist.append(["directory", i.replace(settings.MUSICPATH, "")[:-1]])
         for i in musicfiles:
-            infolist.append(["file", i["Path"].replace(MUSICPATH, "")])
+            infolist.append(["file", i["Path"].replace(settings.MUSICPATH, "")])
             infolist.append(["Time", i["Duration"]])
             infolist.append(["Artist", i["Artist"]])
             infolist.append(["Title", i["Title"]])
@@ -396,7 +393,7 @@ class MPD(basic.LineReceiver):
     def _send_lists(self, datalist):
         data = ""
         for i in datalist:
-            data += "%s: %s\n" %(i[0], i[1])
+            data += "%s: %s\n" % (i[0], i[1])
         self._send(data)
 
     def _send(self, data=""):
@@ -407,7 +404,7 @@ class MPD(basic.LineReceiver):
         else:
             data += "OK"
             if DEBUG:
-                print "RESPONSE: %s" %data
+                print "RESPONSE: %s" % data
             self.sendLine(data)
 
 

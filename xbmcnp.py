@@ -110,7 +110,7 @@ class XBMCControl(object):
             fields = record.split("<field>")[1:]
             if len(fields) == 2:
 #INEFFICIENT!
-              paths.append(self.send("querymusicdatabase(select strPath from path where idPath = %s)" %fields[0])[22:-25]+fields[1])
+                paths.append(self.send("querymusicdatabase(select strPath from path where idPath = %s)" %fields[0])[22:-25]+fields[1])
         return [self.get_tags_from_filename(path) for path in paths]
 
     def list_artists(self):
@@ -145,7 +145,7 @@ class XBMCControl(object):
         return song_count, duration
 
     def playid(self, song_id):
-	  self.send("SetPlaylistSong(%s)" %song_id)
+        self.send("SetPlaylistSong(%s)" %song_id)
 
     def playpause(self):
         self.eventclient.send_action("XBMC.PlayerControl(Play)")

@@ -1,3 +1,4 @@
 HOST = "192.168.1.106"
 PORT = 1337
-MPD_PORT = 6600
+MPD_PORT = 6601
+MUSICPATH = "smb://hda/Music"
