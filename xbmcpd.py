@@ -19,6 +19,7 @@
 from twisted.internet import reactor, protocol
 from twisted.protocols import basic
 import xbmcnp
+import settings
 from pprint import pprint
 
 
@@ -27,7 +28,7 @@ DEBUG = False
 
 class MPD(basic.LineReceiver):
     def __init__(self):
-        self.xbmc = xbmcnp.XBMCControl("192.168.0.14", "8080")
+        self.xbmc = xbmcnp.XBMCControl(settings.HOST, settings.PORT)
         self.delimiter = "\n"
         self.command_list = False
         self.command_list_ok = True
@@ -413,7 +414,7 @@ class MPD(basic.LineReceiver):
 def main():
     factory = protocol.ServerFactory()
     factory.protocol = MPD
-    reactor.listenTCP(6601, factory)
+    reactor.listenTCP(settings.MPD_PORT, factory)
     reactor.run()
 
 if __name__ == '__main__':
