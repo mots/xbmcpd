@@ -180,6 +180,6 @@ class XBMCControl(object):
         self.send("AddToPlayList(%s)" %path)
 
     def list_dates(self):
-        dates = self.send("querymusicdatabase(select iYear from album)")
+        dates = self.send("querymusicdatabase(select distinct iYear from album)")
         dates = dates.replace("<record><field>", "").replace("<html>","").replace("</html>", "").replace("\n", "")
         return dates.split("</field></record>")[:-1]
