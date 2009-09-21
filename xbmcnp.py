@@ -230,6 +230,9 @@ class XBMCControl(object):
             duration = 0
         return song_count, duration
 
+    def seekto(self, percentage):
+        self.send("SeekPercentage(%d)" %percentage)
+
     def playid(self, song_id):
         """
         Play song specified by it's id.

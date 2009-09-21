@@ -21,7 +21,7 @@ from twisted.protocols import basic
 import xbmcnp
 import settings
 
-DEBUG = True
+DEBUG = False
 
 class MPD(basic.LineReceiver):
     """
@@ -42,7 +42,7 @@ class MPD(basic.LineReceiver):
                                    'list', 'count', 'command_list_ok_begin',
                                    'command_list_end', 'commands',
                                    'notcommands', 'outputs', 'tagtypes',
-                                   'playid','stop']
+                                   'playid','stop','seek']
         self.all_commands = ['add', 'addid', 'clear', 'clearerror', 'close',
                             'commands', 'consume','count', 'crossfade',
                             'currentsong', 'delete', 'deleteid',
@@ -183,6 +183,9 @@ class MPD(basic.LineReceiver):
             self.stats()
         elif data.startswith('playid'):
             self.playid(data[8:-1])
+        elif data.startswith("seek"):
+            seekto = data.replace('"', '').split(' ')           # TODO: replace with regex ?
+            self.seek(seekto[1],seekto[2])
         elif data.startswith('pause') or data.startswith('play'):
             print 'RECEIVED %s, pausing/playing' % data
             self.playpause()
@@ -321,6 +324,15 @@ class MPD(basic.LineReceiver):
         """
         self.xbmc.stop()
         self._send()
+
+    def seek(self, song_id, seconds):
+        status = self.xbmc.get_np()
+        if status != None:
+            duration = int(status["Duration"].split(":")[0])*60 + int(status["Duration"].split(":")[1])
+            percentage = float(100/(float(duration) / float(seconds)))
+            self.xbmc.seekto(round(percentage,0))
+
+        self._send()  
 
     def playid(self, song_id):
         """
