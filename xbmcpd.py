@@ -21,7 +21,7 @@ from twisted.protocols import basic
 import xbmcnp
 import settings
 
-DEBUG = False
+DEBUG = True
 
 class MPD(basic.LineReceiver):
     """
@@ -497,28 +497,32 @@ class MPD(basic.LineReceiver):
         playlistlist = []
         
         pos = 0
-        for song in playlist:
-            playlistlist.append(['file', song['Path'].replace(settings.MUSICPATH, '')])
-            playlistlist.append(['Time', song['Duration']])
-            playlistlist.append(['Artist', song['Artist']])
-            playlistlist.append(['Title', song['Title']])
-            playlistlist.append(['Album', song['Album']])
-            playlistlist.append(['Track', song['Track number']])
-            playlistlist.append(['Date', song['Release year']])     
-            playlistlist.append(['Genre', song['Genre']])
-            playlistlist.append(['Pos', pos])
-            playlistlist.append(['Id', pos])
-            pos += 1
-        
-        self.playlist_dict[self.playlist_id] = playlistlist
-        old_playlist = (tuple(info) for info in self.playlist_dict[old_playlist_id])
-        diff = []
-        for plinfo in playlistlist:
-            if tuple(plinfo) not in old_playlist:
-                diff.append(plinfo)
-        #plchanges = set(self.playlist_dict[old_playlist_id]) ^ set(playlistlist)
-        if send:
-            self._send_lists(diff)
+        if playlist != [None]:
+            print playlist
+            for song in playlist:
+                playlistlist.append(['file', song['Path'].replace(settings.MUSICPATH, '')])
+                playlistlist.append(['Time', song['Duration']])
+                playlistlist.append(['Artist', song['Artist']])
+                playlistlist.append(['Title', song['Title']])
+                playlistlist.append(['Album', song['Album']])
+                playlistlist.append(['Track', song['Track number']])
+                playlistlist.append(['Date', song['Release year']])     
+                playlistlist.append(['Genre', song['Genre']])
+                playlistlist.append(['Pos', pos])
+                playlistlist.append(['Id', pos])
+                pos += 1
+            
+            self.playlist_dict[self.playlist_id] = playlistlist
+            old_playlist = (tuple(info) for info in self.playlist_dict[old_playlist_id])
+            diff = []
+            for plinfo in playlistlist:
+                if tuple(plinfo) not in old_playlist:
+                    diff.append(plinfo)
+            #plchanges = set(self.playlist_dict[old_playlist_id]) ^ set(playlistlist)
+            if send:
+                self._send_lists(diff)
+        else:
+            self._send()
 
     def currentsong(self):
         """

@@ -25,11 +25,6 @@ class XBMCControl(object):
     Implements a simple way to control basic XBMC library functions.
     """
 
-    # TODO: get all SQL up here
-    ARTIST_COUNT_SQL = 'querymusicdatabase(select count(*) from artist)'
-    ALBUM_COUNT_SQL = 'querymusicdatabase(select count(*) from album)'
-    SONG_COUNT_SQL = 'querymusicdatabase(select count(*) from song)'
-    TOTAL_LENGTH_SQL = 'querymusicdatabase(select sum(iDuration) from song)'
     
     def __init__(self, ip, port):
         self.ip = ip
@@ -120,10 +115,10 @@ class XBMCControl(object):
 
         Returns artistcount, albumcount, songcount and total playtime
         """
-        artistcount = int(self.send(ARTIST_COUNT_SQL)[22:-25])
-        albumcount = int(self.send(ALBUM_COUNT_SQL)[22:-25])
-        songcount = int(self.send(SONG_COUNT_SQL)[22:-25])
-        totallength = int(self.send(TOTAL_LENGTH_SQL)[22:-25])
+        artistcount = int(self.send('querymusicdatabase(select count(*) from artist)')[22:-25])
+        albumcount = int(self.send('querymusicdatabase(select count(*) from album)')[22:-25])
+        songcount = int(self.send('querymusicdatabase(select count(*) from song)')[22:-25])
+        totallength = int(self.send('querymusicdatabase(select sum(iDuration) from song)')[22:-25])
         return artistcount, albumcount, songcount, totallength
 
     def get_current_playlist(self):
