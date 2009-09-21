@@ -170,7 +170,7 @@ class XBMCControl(object):
         """
         self.list_albums()
         album_id = self.albumdict[albumname]
-        song_ids = self.send("" % album_id)
+        song_ids = self.send("querymusicdatabase(select idPath,strFileName  from song where idAlbum = %s)" % album_id)
         song_ids = song_ids.replace('<html>\n','').replace('</html>\n', '') \
                                                   .replace("</record>", "") \
                                                   .replace("</field>", "")
