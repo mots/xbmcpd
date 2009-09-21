@@ -592,11 +592,15 @@ class MPD(basic.LineReceiver):
         newpath = settings.MUSICPATH + path
         subdirs, musicfiles = self.xbmc.get_directory(newpath)
         infolist = []
+
         for subdir in subdirs:
             infolist.append(['directory',
                              subdir.replace(settings.MUSICPATH, '')[:-1]])
 
         for musicfile in musicfiles:
+            if musicfile == None:
+              continue
+
             infolist.append(['file', musicfile['Path'].replace(settings.MUSICPATH, '')])
             infolist.append(['Time', musicfile['Duration']])
             infolist.append(['Artist', musicfile['Artist']])
