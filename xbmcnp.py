@@ -123,11 +123,11 @@ class XBMCControl(object):
 
     def get_current_playlist(self):
         """
-        Get the current playlist contents.
+        Get the music playlist contents.
 
         Returns a list filled by each file's tags
         """
-        rawtext = self.send("GetPlaylistContents(-1)")
+        rawtext = self.send("GetPlaylistContents(0)")
         playlist = [text.rstrip() for text in rawtext.replace("</html>", "") \
                                                      .split("<li>")[1:]]
         return [self.get_tags_from_filename(musicfile) for musicfile in \
@@ -147,6 +147,12 @@ class XBMCControl(object):
         """
         self.eventclient.send_action("XBMC.PlayerControl(Previous)")
 
+    def stop(self):
+        """
+        Stop playing.
+        """
+        self.eventclient.send_action("XBMC.PlayerControl(Stop)")
+
     def set_volume(self, volume):
         """
         Set the volume.
@@ -157,7 +163,7 @@ class XBMCControl(object):
         """
         Get the playlist length.
         """
-        return int(self.send("GetPlaylistLength")[11:-8])
+        return int(self.send("GetPlaylistLength(0)")[11:-8])
 
     def search_album(self, albumname):
         """
@@ -227,8 +233,17 @@ class XBMCControl(object):
     def playid(self, song_id):
         """
         Play song specified by it's id.
+        Note that the play button will send -1 when playback ist stoped (not paused)
+        That's the reason for the first if block.
+        Also it appears to not work if we omit calling (the undocumented) SetCurrentPlaylist before
         """
         self.send("SetPlaylistSong(%s)" %song_id)
+
+        self.send("SetCurrentPlaylist(0)")
+        if song_id == "-1" or song_id == '0':
+          self.send("PlayListNext(0)")
+        else:
+          self.send("SetPlaylistSong(%s)" %song_id)
 
     def playpause(self):
         """
@@ -242,7 +257,7 @@ class XBMCControl(object):
         Remove a song (specified by it's position inside the playlist) from
         the playlist.
         """
-        self.send("RemoveFromPlaylist(%s)" % pos)
+        self.send("RemoveFromPlaylist(%s,0)" % pos)
     
     def list_artist_albums(self, artist):
         """
@@ -297,7 +312,7 @@ class XBMCControl(object):
         """
         Add the given path to the playlist.
         """
-        self.send("AddToPlayList(%s)" % path)
+        self.send("AddToPlayList(%s,0)" % path)
 
     def list_dates(self):
         """

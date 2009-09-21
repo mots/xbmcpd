@@ -21,7 +21,7 @@ from twisted.protocols import basic
 import xbmcnp
 import settings
 
-DEBUG = False
+DEBUG = True
 
 class MPD(basic.LineReceiver):
     """
@@ -42,7 +42,7 @@ class MPD(basic.LineReceiver):
                                    'list', 'count', 'command_list_ok_begin',
                                    'command_list_end', 'commands',
                                    'notcommands', 'outputs', 'tagtypes',
-                                   'playid']
+                                   'playid','stop']
         self.all_commands = ['add', 'addid', 'clear', 'clearerror', 'close',
                             'commands', 'consume','count', 'crossfade',
                             'currentsong', 'delete', 'deleteid',
@@ -110,7 +110,9 @@ class MPD(basic.LineReceiver):
         elif data == 'next':
             self.next()
         elif data == 'previous':
-            self.next()
+            self.previous()
+        elif data == "stop":
+            self.stop()
         elif data == 'lsinfo':
            #print 'sending directory info'
             self.lsinfo()
@@ -313,6 +315,13 @@ class MPD(basic.LineReceiver):
         self.xbmc.prev()
         self._send()
 
+    def stop(self):
+        """
+        Stop playing.
+        """
+        self.xbmc.stop()
+        self._send()
+
     def playid(self, song_id):
         """
         Get a song by it's id and play it.
@@ -484,10 +493,13 @@ class MPD(basic.LineReceiver):
                         ['random', 0],
                         ['single', 0],
                         ['consume', 0],
-                        ['playlist', 2],
+                        ['playlist', self.playlist_id],
                         ['playlistlength', self.xbmc.get_playlist_length()],
                         ['xfade', 0],
-                        ['state', 'stop']])
+                        ['state', 'stop'],
+                        ["song", 0],
+                        ["songid", 0],
+                        ["time", "00:00"]])
 
     def plchanges(self, old_playlist_id=0, send=True):
         """
@@ -498,10 +510,9 @@ class MPD(basic.LineReceiver):
         #set(L1) ^ set(L2)
         playlist = self.xbmc.get_current_playlist()
         playlistlist = []
-        
+
         pos = 0
         if playlist != [None]:
-            print playlist
             for song in playlist:
                 playlistlist.append(['file', song['Path'].replace(settings.MUSICPATH, '')])
                 playlistlist.append(['Time', song['Duration']])
@@ -572,6 +583,7 @@ class MPD(basic.LineReceiver):
         for subdir in subdirs:
             infolist.append(['directory',
                              subdir.replace(settings.MUSICPATH, '')[:-1]])
+
         for musicfile in musicfiles:
             infolist.append(['file', musicfile['Path'].replace(settings.MUSICPATH, '')])
             infolist.append(['Time', musicfile['Duration']])
@@ -581,6 +593,7 @@ class MPD(basic.LineReceiver):
             infolist.append(['Track', musicfile['Track number']])
             infolist.append(['Date', musicfile['Release year']])     
             infolist.append(['Genre', musicfile['Genre']])
+
         self._send_lists(infolist)
 
 if __name__ == '__main__':
