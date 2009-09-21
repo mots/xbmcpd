@@ -260,7 +260,7 @@ class XBMCControl(object):
         Remove a song (specified by it's position inside the playlist) from
         the playlist.
         """
-        self.send("RemoveFromPlaylist(%s,0)" % pos)
+        self.send("RemoveFromPlaylist(%s;0)" % pos)
     
     def list_artist_albums(self, artist):
         """
@@ -315,7 +315,7 @@ class XBMCControl(object):
         """
         Add the given path to the playlist.
         """
-        self.send("AddToPlayList(%s,0)" % path)
+        self.send("AddToPlayList(%s;0)" % path)
 
     def list_dates(self):
         """

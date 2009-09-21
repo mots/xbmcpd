@@ -42,7 +42,7 @@ class MPD(basic.LineReceiver):
                                    'list', 'count', 'command_list_ok_begin',
                                    'command_list_end', 'commands',
                                    'notcommands', 'outputs', 'tagtypes',
-                                   'playid','stop','seek']
+                                   'playid','stop','seek','plchangesposid']
         self.all_commands = ['add', 'addid', 'clear', 'clearerror', 'close',
                             'commands', 'consume','count', 'crossfade',
                             'currentsong', 'delete', 'deleteid',
@@ -119,11 +119,13 @@ class MPD(basic.LineReceiver):
         elif data.startswith('add'):
             self.add(data[5:-1])
         elif data.startswith('deleteid'):
-            self.delete_id(data[9:-1])
+            self.delete_id(data[10:-1])
         elif data.startswith('delete'):
             self.delete_id(data[8:-1])
         elif data.startswith('lsinfo'):
             self.lsinfo(data[8:-1])
+        elif data.startswith('plchangesposid'):
+            self.plchangesposid(int(data[16:-1]))
         elif data.startswith('plchanges'):
             print data
             self.plchanges(int(data[11:-1]))
@@ -549,6 +551,19 @@ class MPD(basic.LineReceiver):
                 self._send_lists(diff)
         else:
             self._send()
+
+    def plchangesposid(self, old_playlist_id=0, send=True):
+        """
+        This should actually not call plchanges.
+        The correct implementation would be:
+
+        "This function only returns the position and the id of the changed song, 
+        not the complete metadata. This is more bandwidth efficient."
+
+        But it shall work for now - TODO : As stated above !
+        """
+        
+        self.plchanges(old_playlist_id,send)
 
     def currentsong(self):
         """
