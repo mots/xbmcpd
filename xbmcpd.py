@@ -21,7 +21,7 @@ from twisted.protocols import basic
 import xbmcnp
 import settings
 
-DEBUG = True
+DEBUG = False
 
 class MPD(basic.LineReceiver):
     """
@@ -290,9 +290,12 @@ class MPD(basic.LineReceiver):
 
     def add(self, path):
         """
-        Add a specified path to the library.
+        Adds a specified path to the playlist.
         """
-        self.xbmc.add_to_playlist(settings.MUSICPATH+path)
+        if self.xbmc.get_playlist_length() == 0:
+            self.xbmc.play_file(settings.MUSICPATH+path)
+        else:
+            self.xbmc.add_to_playlist(settings.MUSICPATH+path)
         self.playlist_id += 1
         self._send()
 
@@ -408,7 +411,7 @@ class MPD(basic.LineReceiver):
         Searches for a specified album.
 
         If albums have been found it uses _send_lists() to push data,
-        otherwise _send() is beeing used.
+        otherwise _send() is being used.
         """
         if album == '':
             self._send()

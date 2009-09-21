@@ -157,7 +157,7 @@ class XBMCControl(object):
         """
         Get the playlist length.
         """
-        return self.send("GetPlaylistLength")[11:-8]
+        return int(self.send("GetPlaylistLength")[11:-8])
 
     def search_album(self, albumname):
         """
@@ -286,6 +286,12 @@ class XBMCControl(object):
         self.list_albums()
         date = self.send("querymusicdatabase(select iYear from album where idAlbum =  %s)" % self.albumdict[album])[22:-25]
         return date
+
+    def play_file(self, path):
+        """
+        Play the given path
+        """
+        self.send("PlayFile(%s)" % path)
 
     def add_to_playlist(self, path):
         """
