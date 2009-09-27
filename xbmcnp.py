@@ -25,7 +25,6 @@ class XBMCControl(object):
     Implements a simple way to control basic XBMC library functions.
     """
 
-    
     def __init__(self, ip, port):
         self.ip = ip
         self.port = port
@@ -127,43 +126,43 @@ class XBMCControl(object):
 
         Returns a list filled by each file's tags
         """
-        rawtext = self.send("GetPlaylistContents(0)")
-        playlist = [text.rstrip() for text in rawtext.replace("</html>", "") \
-                                                     .split("<li>")[1:]]
+        rawtext = self.send('GetPlaylistContents(0)')
+        playlist = [text.rstrip() for text in rawtext.replace('</html>', '') \
+                                                     .split('<li>')[1:]]
         return [self.get_tags_from_filename(musicfile) for musicfile in \
-                [text.rstrip() for text in rawtext.replace("</html>", "") \
-                                                  .split("<li>")[1:]]]
+                [text.rstrip() for text in rawtext.replace('</html>', '') \
+                                                  .split('<li>')[1:]]]
 
     def next(self):
         """
         Skip to the next song.
         """
-        self.eventclient.send_action("XBMC.PlayerControl(Next)")
+        self.eventclient.send_action('XBMC.PlayerControl(Next)')
         #self.send("PlayListNext")
 
     def prev(self):
         """
         Return to the previous song.
         """
-        self.eventclient.send_action("XBMC.PlayerControl(Previous)")
+        self.eventclient.send_action('XBMC.PlayerControl(Previous)')
 
     def stop(self):
         """
         Stop playing.
         """
-        self.eventclient.send_action("XBMC.PlayerControl(Stop)")
+        self.eventclient.send_action('XBMC.PlayerControl(Stop)')
 
     def set_volume(self, volume):
         """
         Set the volume.
         """
-        self.eventclient.send_action("XBMC.SetVolume(%s)" % volume)
+        self.eventclient.send_action('XBMC.SetVolume(%s)' % volume)
 
     def get_playlist_length(self):
         """
         Get the playlist length.
         """
-        return int(self.send("GetPlaylistLength(0)")[11:-8])
+        return int(self.send('GetPlaylistLength(0)')[11:-8])
 
     def search_album(self, albumname):
         """
@@ -171,17 +170,17 @@ class XBMCControl(object):
         """
         self.list_albums()
         album_id = self.albumdict[albumname]
-        song_ids = self.send("querymusicdatabase(select idPath,strFileName  from song where idAlbum = %s)" % album_id)
+        song_ids = self.send('querymusicdatabase(select idPath,strFileName  from song where idAlbum = %s)' % album_id)
         song_ids = song_ids.replace('<html>\n','').replace('</html>\n', '') \
-                                                  .replace("</record>", "") \
-                                                  .replace("</field>", "")
-        records = song_ids.split("<record>")
+                                                  .replace('</record>', '') \
+                                                  .replace('</field>', '')
+        records = song_ids.split('<record>')
         paths = []
         for record in records: 
-            fields = record.split("<field>")[1:]
+            fields = record.split('<field>')[1:]
             if len(fields) == 2:
                 #INEFFICIENT!
-                paths.append(self.send("querymusicdatabase(select strPath from path where idPath = %s)" % fields[0])[22:-25]+fields[1])
+                paths.append(self.send('querymusicdatabase(select strPath from path where idPath = %s)' % fields[0])[22:-25]+fields[1])
         return [self.get_tags_from_filename(path) for path in paths]
 
     def list_artists(self):
@@ -189,13 +188,13 @@ class XBMCControl(object):
         Returns a list of all artists.
         """
         if len(self.artistdict) < 1:
-            artists = self.send("querymusicdatabase(select strArtist, idArtist from artist order by strArtist)")
+            artists = self.send('querymusicdatabase(select strArtist, idArtist from artist order by strArtist)')
             artists = artists.replace('<html>\n','').replace('</html>\n', '') \
-                                                    .replace("</record>", "") \
-                                                    .replace("</field>", "")
-            records = artists.split("<record>")
+                                                    .replace('</record>', '') \
+                                                    .replace('</field>', '')
+            records = artists.split('<record>')
             for record in records:
-                fields = record.split("<field>")[1:]
+                fields = record.split('<field>')[1:]
                 if len(fields) == 2:
                     self.artistdict[fields[0]] = fields[1]
         return self.artistdict.keys()
@@ -205,13 +204,13 @@ class XBMCControl(object):
         Returns a list of all genres.
         """
         if len(self.genredict) < 1:
-            genres = self.send("querymusicdatabase(select strGenre, idGenre from genre order by strGenre)")
+            genres = self.send('querymusicdatabase(select strGenre, idGenre from genre order by strGenre)')
             genres = genres.replace('<html>\n','').replace('</html>\n', '') \
-                                                  .replace("</record>", "") \
-                                                  .replace("</field>", "")
-            records = genres.split("<record>")
+                                                  .replace('</record>', '') \
+                                                  .replace('</field>', '')
+            records = genres.split('<record>')
             for record in records:
-                fields = record.split("<field>")[1:]
+                fields = record.split('<field>')[1:]
                 if len(fields) == 2:
                     self.genredict[fields[0]] = fields[1]
         return self.genredict.keys()
@@ -224,9 +223,9 @@ class XBMCControl(object):
         """
         self.list_artists()
         artist_id = self.artistdict[artist]
-        song_count = self.send("querymusicdatabase(select count(*) from song where idArtist =  %s)" % artist_id)[22:-25]
-        duration = self.send("querymusicdatabase(select sum(iDuration) from song where idArtist = %s)" % artist_id)[22:-25]
-        if song_count == "0":
+        song_count = self.send('querymusicdatabase(select count(*) from song where idArtist =  %s)' % artist_id)[22:-25]
+        duration = self.send('querymusicdatabase(select sum(iDuration) from song where idArtist = %s)' % artist_id)[22:-25]
+        if song_count == '0':
             duration = 0
         return song_count, duration
 
@@ -236,31 +235,32 @@ class XBMCControl(object):
     def playid(self, song_id):
         """
         Play song specified by it's id.
-        Note that the play button will send -1 when playback ist stoped (not paused)
+        
+        Note that the play button will send -1 when playback is stopped (not paused)
         That's the reason for the first if block.
         Also it appears to not work if we omit calling (the undocumented) SetCurrentPlaylist before
         """
-        self.send("SetPlaylistSong(%s)" %song_id)
+        self.send('SetPlaylistSong(%s)' %song_id)
 
-        self.send("SetCurrentPlaylist(0)")
-        if song_id == "-1" or song_id == '0':
-          self.send("PlayListNext(0)")
+        self.send('SetCurrentPlaylist(0)')
+        if song_id == '-1' or song_id == '0':
+          self.send('PlayListNext(0)')
         else:
-          self.send("SetPlaylistSong(%s)" %song_id)
+          self.send('SetPlaylistSong(%s)' %song_id)
 
     def playpause(self):
         """
         Toggle play or pause.
         """
-        self.eventclient.send_action("XBMC.PlayerControl(Play)")
-        #self.send("pause")
+        self.eventclient.send_action('XBMC.PlayerControl(Play)')
+        #self.send('pause')
 
     def remove_from_playlist(self, pos):
         """
         Remove a song (specified by it's position inside the playlist) from
         the playlist.
         """
-        self.send("RemoveFromPlaylist(%s;0)" % pos)
+        self.send('RemoveFromPlaylist(%s;0)' % pos)
     
     def list_artist_albums(self, artist):
         """
@@ -269,11 +269,11 @@ class XBMCControl(object):
         Returns a list.
         """
         self.list_artists()
-        albums = self.send("querymusicdatabase(select strAlbum from album where idArtist = %s)" % self.artistdict[artist])
-        albums = albums.replace("<record><field>", "").replace("<html>","") \
-                                                      .replace("</html>", "") \
-                                                      .replace("\n", "")
-        return albums.split("</field></record>")[:-1]
+        albums = self.send('querymusicdatabase(select strAlbum from album where idArtist = %s)' % self.artistdict[artist])
+        albums = albums.replace('<record><field>', '').replace('<html>','') \
+                                                      .replace('</html>', '') \
+                                                      .replace('\n', '')
+        return albums.split('</field></record>')[:-1]
 
     def list_albums(self):
         """
@@ -282,13 +282,13 @@ class XBMCControl(object):
         Returns a list
         """
         if len(self.albumdict) <1:
-            albums = self.send("querymusicdatabase(select strAlbum, idAlbum from album order by strAlbum)")
+            albums = self.send('querymusicdatabase(select strAlbum, idAlbum from album order by strAlbum)')
             albums = albums.replace('<html>\n','').replace('</html>\n', '') \
-                                                  .replace("</record>", "") \
-                                                  .replace("</field>", "")
-            records = albums.split("<record>")
+                                                  .replace('</record>', '') \
+                                                  .replace('</field>', '')
+            records = albums.split('<record>')
             for record in records:
-                fields = record.split("<field>")[1:]
+                fields = record.split('<field>')[1:]
                 if len(fields) == 2:
                     self.albumdict[fields[0]] = fields[1]
         return self.albumdict.keys()
@@ -302,20 +302,20 @@ class XBMCControl(object):
         TODO: Return a nice datetime object?
         """
         self.list_albums()
-        date = self.send("querymusicdatabase(select iYear from album where idAlbum =  %s)" % self.albumdict[album])[22:-25]
+        date = self.send('querymusicdatabase(select iYear from album where idAlbum =  %s)' % self.albumdict[album])[22:-25]
         return date
 
     def play_file(self, path):
         """
         Play the given path
         """
-        self.send("PlayFile(%s)" % path)
+        self.send('PlayFile(%s)' % path)
 
     def add_to_playlist(self, path):
         """
         Add the given path to the playlist.
         """
-        self.send("AddToPlayList(%s;0)" % path)
+        self.send('AddToPlayList(%s;0)' % path)
 
     def list_dates(self):
         """
@@ -323,8 +323,8 @@ class XBMCControl(object):
 
         Returns a list.
         """
-        dates = self.send("querymusicdatabase(select distinct iYear from album)")
-        dates = dates.replace("<record><field>", "").replace("<html>","") \
-                                                    .replace("</html>", "") \
-                                                    .replace("\n", "")
-        return dates.split("</field></record>")[:-1]
+        dates = self.send('querymusicdatabase(select distinct iYear from album)')
+        dates = dates.replace('<record><field>', '').replace('<html>','') \
+                                                    .replace('</html>', '') \
+                                                    .replace('\n', '')
+        return dates.split('</field></record>')[:-1]
